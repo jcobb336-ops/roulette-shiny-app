@@ -1,0 +1,15 @@
+Package: RouletteShinyApp
+Title: American Roulette Risk Lab
+Version: 0.1.0
+Authors@R: person("Josh", "Cobb", role = c("aut", "cre"), email = "josh@example.com")
+Description: A Shiny app for analyzing American roulette expected value, bankroll risk, and betting strategies.
+License: MIT
+Encoding: UTF-8
+Imports:
+    bslib,
+    bsicons,
+    dplyr,
+    ggplot2,
+    scales,
+    shiny,
+    testthat

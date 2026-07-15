@@ -1,0 +1,433 @@
+:root {
+  --app-font: "Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+  --ink: #25282a;
+  --muted: #5b6165;
+  --line: #ded8ce;
+  --surface: #fbfaf7;
+  --page: #f6f4ef;
+}
+
+html,
+body {
+  background: var(--page);
+  color: var(--ink);
+  font-family: var(--app-font);
+  font-size: 16px;
+  line-height: 1.45;
+}
+
+body,
+button,
+input,
+select,
+textarea,
+.form-control,
+.form-select,
+.irs,
+.nav-link,
+.card,
+.card-header,
+.bslib-value-box,
+table {
+  font-family: var(--app-font);
+  letter-spacing: 0;
+}
+
+.app-title {
+  display: flex;
+  flex-direction: column;
+  gap: 0.1rem;
+}
+
+.app-title span {
+  font-size: clamp(1.375rem, 1.6vw, 1.625rem);
+  font-weight: 750;
+  line-height: 1.15;
+}
+
+.app-title small {
+  color: rgba(255, 255, 255, 0.78);
+  font-size: 0.82rem;
+  line-height: 1.25;
+}
+
+.nav-link {
+  font-size: clamp(1.0625rem, 1.2vw, 1.1875rem);
+  font-weight: 700;
+  line-height: 1.2;
+  padding-block: 0.95rem;
+  white-space: nowrap;
+}
+
+.input-sidebar {
+  background: var(--surface);
+  border-right: 1px solid var(--line);
+}
+
+.input-sidebar h4 {
+  font-size: 1.125rem;
+  font-weight: 750;
+  line-height: 1.25;
+}
+
+.input-sidebar label,
+.form-label,
+.checkbox label {
+  color: #34383b;
+  font-size: 0.95rem;
+  font-weight: 650;
+  line-height: 1.3;
+}
+
+.form-control,
+.form-select,
+.btn {
+  font-size: 0.95rem;
+  line-height: 1.35;
+}
+
+.sidebar-note,
+.run-status {
+  color: #4b4f52;
+  font-size: 0.9rem;
+  line-height: 1.35;
+}
+
+.run-status {
+  margin-top: 0.65rem;
+  padding: 0.6rem 0.75rem;
+  border: 1px solid #d6d0c6;
+  border-radius: 8px;
+  background: #f4efe6;
+}
+
+.simulation-context-card {
+  margin-bottom: 1rem;
+  overflow: visible;
+}
+
+.simulation-plot-grid {
+  margin-top: 2rem;
+}
+
+.simulation-context {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  min-height: 3.25rem;
+  padding: 0.7rem 0.9rem;
+}
+
+.simulation-context__label {
+  color: var(--muted);
+  font-size: 0.9rem;
+  font-weight: 750;
+  line-height: 1.25;
+  text-transform: uppercase;
+}
+
+.simulation-context__value {
+  color: var(--ink);
+  font-size: clamp(0.92rem, 1.1vw, 1rem);
+  font-weight: 650;
+  line-height: 1.3;
+  text-align: right;
+  overflow-wrap: anywhere;
+}
+
+.card {
+  border-radius: 8px;
+  border: 1px solid var(--line);
+  box-shadow: 0 8px 24px rgba(49, 45, 39, 0.07);
+  overflow: visible;
+}
+
+.card:not(.kpi-card).html-fill-item {
+  height: auto !important;
+  min-height: max-content;
+}
+
+.card:not(.kpi-card) > .card-body {
+  height: auto !important;
+  min-height: max-content;
+  overflow: visible;
+}
+
+.shiny-table-output {
+  overflow-x: auto;
+  overflow-y: visible;
+}
+
+.bslib-grid {
+  row-gap: 1.5rem !important;
+}
+
+.bslib-grid-item:has(.kpi-card) {
+  min-height: 6.25rem !important;
+}
+
+.kpi-card {
+  position: relative;
+  min-height: 6.25rem;
+  height: 100%;
+  overflow: visible;
+}
+
+.kpi-card > .card-body {
+  display: flex;
+  min-height: 6.25rem;
+  align-items: center;
+  padding: 0.75rem 1rem;
+}
+
+.kpi-card__content {
+  display: flex;
+  min-width: 0;
+  width: 100%;
+  flex-direction: column;
+  justify-content: center;
+  gap: 0.35rem;
+  padding-right: 2.25rem;
+}
+
+.kpi-card__label {
+  color: #303437;
+  font-size: clamp(0.94rem, 1vw, 1.02rem);
+  font-weight: 700;
+  line-height: 1.25;
+}
+
+.kpi-card__value {
+  color: #1f2327;
+  font-size: clamp(28px, 2.25vw, 36px);
+  font-weight: 550;
+  line-height: 1.05;
+  max-width: 100%;
+  overflow-wrap: anywhere;
+  white-space: nowrap;
+}
+
+.kpi-card__icon {
+  position: absolute;
+  top: 0.75rem;
+  right: 0.75rem;
+  display: flex;
+  width: 2rem;
+  height: 2rem;
+  align-items: center;
+  justify-content: center;
+  color: #465052;
+  opacity: 0.3;
+}
+
+.kpi-card__value .shiny-text-output {
+  color: inherit;
+  font: inherit;
+  line-height: inherit;
+}
+
+@media (min-width: 1400px) {
+  .kpi-card__value {
+    font-size: clamp(28px, 2.5vw, 40px);
+  }
+}
+
+.kpi-card__icon svg,
+.kpi-card__icon i {
+  width: 2rem;
+  height: 2rem;
+  max-width: 2rem;
+  max-height: 2rem;
+}
+
+.card-header {
+  background: var(--surface);
+  color: var(--ink);
+  font-size: clamp(1.125rem, 1.35vw, 1.375rem);
+  font-weight: 750;
+  line-height: 1.25;
+  padding: 0.85rem 1rem;
+}
+
+.card-body {
+  font-size: 1rem;
+  line-height: 1.45;
+}
+
+.bslib-value-box {
+  position: relative;
+  min-height: 10.25rem;
+  height: 100%;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  overflow: visible;
+}
+
+.bslib-grid-item:has(.bslib-value-box) {
+  min-height: 10.25rem !important;
+}
+
+.bslib-value-box .value-box-grid {
+  min-height: 10.25rem;
+  height: 100%;
+}
+
+.bslib-value-box .value-box-area {
+  display: flex;
+  min-height: 10.25rem;
+  flex-direction: column;
+  justify-content: center;
+  gap: 0.8rem;
+  padding: 1.25rem 4.1rem 1.25rem 1.25rem;
+}
+
+.bslib-value-box .value-box-title {
+  max-width: 100%;
+  color: #303437;
+  font-size: clamp(0.94rem, 1.05vw, 1.0625rem);
+  font-weight: 700;
+  line-height: 1.25;
+  margin: 0;
+  overflow-wrap: normal;
+}
+
+.bslib-value-box .value-box-value {
+  color: #1f2327;
+  font-size: clamp(28px, 3vw, 48px);
+  font-weight: 550;
+  line-height: 1.05;
+  margin: 0;
+  max-width: 100%;
+  overflow-wrap: anywhere;
+  white-space: normal;
+}
+
+.bslib-value-box .value-box-showcase {
+  position: absolute;
+  top: 1.1rem;
+  right: 1.1rem;
+  display: flex;
+  width: 2.2rem;
+  height: 2.2rem;
+  align-items: center;
+  justify-content: center;
+  color: #465052;
+  opacity: 0.3;
+  pointer-events: none;
+}
+
+.bslib-value-box .value-box-showcase svg,
+.bslib-value-box .value-box-showcase i {
+  width: 2.2rem;
+  height: 2.2rem;
+  max-width: 2.2rem;
+  max-height: 2.2rem;
+  stroke-width: 1.8;
+}
+
+p,
+li {
+  font-size: 1rem;
+  line-height: 1.5;
+}
+
+table {
+  width: 100%;
+  font-size: 0.95rem;
+  line-height: 1.4;
+}
+
+th,
+td {
+  padding: 0.65rem 0.8rem;
+  vertical-align: middle;
+}
+
+th {
+  color: #34383b;
+  font-weight: 750;
+}
+
+td {
+  color: var(--ink);
+}
+
+th:not(:first-child),
+td:not(:first-child) {
+  text-align: right;
+}
+
+td:first-child,
+th:first-child {
+  text-align: left;
+}
+
+@media (max-width: 1200px) {
+  .bslib-grid-item:has(.kpi-card),
+  .kpi-card,
+  .kpi-card > .card-body {
+    min-height: 6.25rem;
+  }
+
+  .kpi-card__label {
+    font-size: 0.95rem;
+  }
+
+  .kpi-card__value {
+    font-size: clamp(28px, 2.35vw, 34px);
+  }
+
+  .bslib-grid-item:has(.bslib-value-box),
+  .bslib-value-box {
+    min-height: 9.75rem;
+  }
+
+  .bslib-value-box .value-box-grid,
+  .bslib-value-box .value-box-area {
+    min-height: 9.75rem;
+  }
+
+  .bslib-value-box .value-box-title {
+    font-size: 0.95rem;
+  }
+
+  .bslib-value-box .value-box-value {
+    font-size: clamp(28px, 2.7vw, 40px);
+  }
+}
+
+@media (max-width: 900px) {
+  .nav-link {
+    font-size: 1rem;
+  }
+
+  .simulation-context {
+    align-items: flex-start;
+    flex-direction: column;
+  }
+
+  .simulation-context__value {
+    text-align: left;
+  }
+
+  .bslib-grid-item:has(.kpi-card),
+  .kpi-card,
+  .kpi-card > .card-body {
+    min-height: 6.75rem;
+  }
+
+  .kpi-card > .card-body {
+    padding: 1rem;
+  }
+
+  .bslib-grid-item:has(.bslib-value-box),
+  .bslib-value-box {
+    min-height: 8.75rem;
+  }
+
+  .bslib-value-box .value-box-grid,
+  .bslib-value-box .value-box-area {
+    min-height: 8.75rem;
+  }
+}

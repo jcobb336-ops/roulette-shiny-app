@@ -15,9 +15,27 @@ theme <- bs_theme(
   primary = "#426b69",
   secondary = "#7467a9",
   base_font = font_google("Inter"),
+<<<<<<< HEAD
   heading_font = font_google("Source Serif 4")
 )
 
+=======
+  heading_font = font_google("Inter")
+)
+
+kpi_card <- function(label, value, icon) {
+  card(
+    class = "kpi-card",
+    div(
+      class = "kpi-card__content",
+      div(class = "kpi-card__label", label),
+      div(class = "kpi-card__value", value)
+    ),
+    div(class = "kpi-card__icon", icon)
+  )
+}
+
+>>>>>>> 746af3a (Finalize American Roulette Risk Lab)
 ui <- page_sidebar(
   title = div(
     class = "app-title",
@@ -46,12 +64,20 @@ ui <- page_sidebar(
     numericInput("base_bet", "Base bet", value = 10, min = 1, step = 5),
     sliderInput("spins", "Spins per session", min = 10, max = 500, value = 150, step = 10),
     sliderInput("simulations", "Simulation runs", min = 100, max = 5000, value = 1000, step = 100),
+<<<<<<< HEAD
     checkboxInput("use_seed", "Use reproducible seed", value = TRUE),
+=======
+    checkboxInput("use_seed", "Use reproducible seed", value = FALSE),
+>>>>>>> 746af3a (Finalize American Roulette Risk Lab)
     conditionalPanel(
       "input.use_seed",
       numericInput("seed", "Seed", value = 2026, min = 1, step = 1)
     ),
     actionButton("run", "Run simulation", class = "btn-primary w-100"),
+<<<<<<< HEAD
+=======
+    div(class = "run-status", textOutput("run_status")),
+>>>>>>> 746af3a (Finalize American Roulette Risk Lab)
     tags$hr(),
     div(
       class = "sidebar-note",
@@ -66,6 +92,7 @@ ui <- page_sidebar(
       "Overview",
       layout_columns(
         col_widths = c(4, 4, 4),
+<<<<<<< HEAD
         value_box(
           "Wheel slots",
           AMERICAN_ROULETTE$slot_count,
@@ -80,6 +107,24 @@ ui <- page_sidebar(
           "Even-money win rate",
           percent(18 / AMERICAN_ROULETTE$slot_count, accuracy = 0.01),
           showcase = bsicons::bs_icon("percent")
+=======
+        row_heights = "6.25rem",
+        gap = "1.5rem",
+        kpi_card(
+          "Wheel slots",
+          AMERICAN_ROULETTE$slot_count,
+          bsicons::bs_icon("circle")
+        ),
+        kpi_card(
+          "House edge",
+          percent(AMERICAN_ROULETTE$house_edge, accuracy = 0.01),
+          bsicons::bs_icon("graph-down")
+        ),
+        kpi_card(
+          "Even-money win rate",
+          percent(18 / AMERICAN_ROULETTE$slot_count, accuracy = 0.01),
+          bsicons::bs_icon("percent")
+>>>>>>> 746af3a (Finalize American Roulette Risk Lab)
         )
       ),
       card(
@@ -96,10 +141,19 @@ ui <- page_sidebar(
       "Analysis",
       layout_columns(
         col_widths = c(3, 3, 3, 3),
+<<<<<<< HEAD
         value_box("Win probability", textOutput("win_probability"), showcase = bsicons::bs_icon("check-circle")),
         value_box("Loss probability", textOutput("loss_probability"), showcase = bsicons::bs_icon("x-circle")),
         value_box("EV per bet", textOutput("ev_per_bet"), showcase = bsicons::bs_icon("calculator")),
         value_box("EV over session", textOutput("ev_total"), showcase = bsicons::bs_icon("activity"))
+=======
+        row_heights = "6.25rem",
+        gap = "1.5rem",
+        kpi_card("Win probability", textOutput("win_probability"), bsicons::bs_icon("check-circle")),
+        kpi_card("Loss probability", textOutput("loss_probability"), bsicons::bs_icon("x-circle")),
+        kpi_card("EV per bet", textOutput("ev_per_bet"), bsicons::bs_icon("calculator")),
+        kpi_card("EV over session", textOutput("ev_total"), bsicons::bs_icon("activity"))
+>>>>>>> 746af3a (Finalize American Roulette Risk Lab)
       ),
       card(
         card_header("Exact calculation summary"),
@@ -112,6 +166,7 @@ ui <- page_sidebar(
     ),
     nav_panel(
       "Simulation",
+<<<<<<< HEAD
       layout_columns(
         col_widths = c(3, 3, 3, 3),
         value_box("Mean final bankroll", textOutput("mean_final"), showcase = bsicons::bs_icon("wallet2")),
@@ -126,6 +181,45 @@ ui <- page_sidebar(
       ),
       card(
         card_header("Simulation summary"),
+=======
+      card(
+        class = "simulation-context-card",
+        div(
+          class = "simulation-context",
+          div(
+            class = "simulation-context__label",
+            "Current simulation"
+          ),
+          div(
+            class = "simulation-context__value",
+            textOutput("simulation_context", inline = TRUE)
+          )
+        )
+      ),
+      layout_columns(
+        col_widths = c(3, 3, 3, 3),
+        row_heights = "6.25rem",
+        gap = "1.5rem",
+        kpi_card("Average ending bankroll", textOutput("mean_final"), bsicons::bs_icon("wallet2")),
+        kpi_card("Sessions above start", textOutput("prob_profit"), bsicons::bs_icon("arrow-up-circle")),
+        kpi_card("Bankrupt sessions", textOutput("prob_ruin"), bsicons::bs_icon("exclamation-triangle")),
+        kpi_card("Median ending bankroll", textOutput("median_final"), bsicons::bs_icon("bar-chart"))
+      ),
+      layout_columns(
+        col_widths = c(6, 6),
+        class = "simulation-plot-grid",
+        card(
+          card_header("Bankroll paths"),
+          plotOutput("paths_plot", height = 420)
+        ),
+        card(
+          card_header("Ending bankroll distribution"),
+          plotOutput("distribution_plot", height = 420)
+        )
+      ),
+      card(
+        card_header("Detailed results"),
+>>>>>>> 746af3a (Finalize American Roulette Risk Lab)
         tableOutput("simulation_table")
       )
     ),
@@ -190,6 +284,7 @@ server <- function(input, output, session) {
       need(input$base_bet <= input$initial_bankroll, "Base bet cannot exceed the initial bankroll.")
     )
 
+<<<<<<< HEAD
     simulate_sessions(
       initial_bankroll = input$initial_bankroll,
       base_bet = input$base_bet,
@@ -210,6 +305,36 @@ server <- function(input, output, session) {
       bet_type = input$bet_type,
       seed = simulation_seed()
     )
+=======
+    withProgress(message = "Running roulette simulation", value = 0.35, {
+      result <- simulate_sessions(
+        initial_bankroll = input$initial_bankroll,
+        base_bet = input$base_bet,
+        spins = input$spins,
+        simulations = input$simulations,
+        bet_type = input$bet_type,
+        strategy = input$strategy,
+        seed = simulation_seed()
+      )
+      incProgress(0.65)
+      result
+    })
+  }, ignoreNULL = FALSE)
+
+  comparison <- eventReactive(input$run, {
+    withProgress(message = "Comparing strategies", value = 0.35, {
+      result <- simulate_strategy_comparison(
+        initial_bankroll = input$initial_bankroll,
+        base_bet = input$base_bet,
+        spins = input$spins,
+        simulations = input$simulations,
+        bet_type = input$bet_type,
+        seed = simulation_seed()
+      )
+      incProgress(0.65)
+      result
+    })
+>>>>>>> 746af3a (Finalize American Roulette Risk Lab)
   }, ignoreNULL = FALSE)
 
   summary_stats <- reactive({
@@ -225,6 +350,37 @@ server <- function(input, output, session) {
       select(`Bet type` = bet_type, `Winning slots` = win_slots, `Win probability` = probability_win, Payout = payout)
   })
 
+<<<<<<< HEAD
+=======
+  output$run_status <- renderText({
+    if (input$run == 0) {
+      "Simulation will run with current inputs."
+    } else {
+      paste(
+        "Last run:",
+        format(Sys.time(), "%I:%M:%S %p"),
+        "|",
+        format(input$simulations, big.mark = ","),
+        "sessions"
+      )
+    }
+  })
+
+  output$simulation_context <- renderText({
+    paste(
+      format(input$simulations, big.mark = ","),
+      "sessions",
+      "|",
+      input$spins,
+      "spins each",
+      "|",
+      input$strategy,
+      "|",
+      input$bet_type
+    )
+  })
+
+>>>>>>> 746af3a (Finalize American Roulette Risk Lab)
   output$win_probability <- renderText(percent(metrics()$probability_win, accuracy = 0.01))
   output$loss_probability <- renderText(percent(metrics()$probability_loss, accuracy = 0.01))
   output$ev_per_bet <- renderText(currency(metrics()$expected_value_per_bet))
@@ -263,7 +419,11 @@ server <- function(input, output, session) {
       geom_hline(yintercept = input$initial_bankroll, linetype = "dashed", color = "#202124") +
       labs(x = "Spin", y = "Expected bankroll") +
       scale_y_continuous(labels = dollar) +
+<<<<<<< HEAD
       theme_minimal(base_size = 13)
+=======
+      roulette_plot_theme()
+>>>>>>> 746af3a (Finalize American Roulette Risk Lab)
   })
 
   output$mean_final <- renderText(currency(summary_stats()$mean_final_bankroll))
