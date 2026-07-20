@@ -1,6 +1,6 @@
 # American Roulette Risk Lab
 
-An R Shiny app for a graduate course assignment analyzing roulette as a negative expected value betting problem.
+An R Shiny app for a graduate course assignment analyzing American roulette color bets, bankroll risk, and betting-system volatility.
 
 ## Scope
 
@@ -8,19 +8,23 @@ The app is fixed to American roulette:
 
 - 38 slots total
 - Slots are `0`, `00`, and `1` through `36`
-- Straight-up win probability is `1/38`
-- Even-money win probability is `18/38`
+- Red win probability is `18/38`
+- Black win probability is `18/38`
+- Green-pocket probability is `2/38`
+- Red and black pay `1:1`
+- The app's `Green (0, 00)` option is modeled as a two-pocket wager paying `17:1`
 - House edge is `2/38`, or about `5.26%`
 
 ## Features
 
-- Exact expected value and variance calculations
-- Monte Carlo bankroll simulations
-- Flat betting, Martingale, and Fibonacci strategies
+- Visual American roulette table and payout guide
+- Exact probability, expected value, and house-edge calculations
+- Monte Carlo bankroll simulations controlled by the Run Simulation button
+- Flat betting, Martingale, Fibonacci, and D'Alembert strategies
 - Bankroll trajectory plots
 - Final bankroll distribution plots
 - Strategy comparison
-- Methodology tab documenting assumptions
+- Methodology tab documenting payout assumptions, seed behavior, and model limits
 
 ## Run Locally
 

@@ -25,14 +25,14 @@ plot_bankroll_paths <- function(paths, expected) {
     ggplot2::labs(
       x = "Spin",
       y = "Bankroll",
-      title = "Simulated bankroll paths",
+      title = "Cumulative bankroll paths",
       subtitle = "Red line shows theoretical expected bankroll"
     ) +
     ggplot2::scale_y_continuous(labels = scales::dollar) +
     roulette_plot_theme()
 }
 
-plot_final_distribution <- function(outcomes, initial_bankroll) {
+plot_final_distribution <- function(outcomes, initial_bankroll, theoretical_mean) {
   ggplot2::ggplot(outcomes, ggplot2::aes(final_bankroll)) +
     ggplot2::geom_histogram(bins = 35, fill = "#426b69", color = "white") +
     ggplot2::geom_vline(
@@ -43,14 +43,19 @@ plot_final_distribution <- function(outcomes, initial_bankroll) {
     ) +
     ggplot2::geom_vline(
       xintercept = mean(outcomes$final_bankroll),
+      color = "#59788e",
+      linewidth = 1
+    ) +
+    ggplot2::geom_vline(
+      xintercept = theoretical_mean,
       color = "#b13f3f",
       linewidth = 1
     ) +
     ggplot2::labs(
       x = "Final bankroll",
       y = "Sessions",
-      title = "Distribution of final bankroll",
-      subtitle = "Dashed line is starting bankroll; red line is simulated mean"
+      title = "Distribution of ending bankrolls",
+      subtitle = "Dashed line is starting bankroll; blue is simulated mean; red is theoretical mean"
     ) +
     ggplot2::scale_x_continuous(labels = scales::dollar) +
     roulette_plot_theme()
@@ -58,7 +63,7 @@ plot_final_distribution <- function(outcomes, initial_bankroll) {
 
 plot_strategy_comparison <- function(outcomes, initial_bankroll) {
   ggplot2::ggplot(outcomes, ggplot2::aes(strategy, final_bankroll, fill = strategy)) +
-    ggplot2::geom_boxplot(width = 0.6, alpha = 0.88, outlier.alpha = 0.2) +
+    ggplot2::geom_boxplot(width = 0.62, alpha = 0.88, outlier.alpha = 0.2) +
     ggplot2::geom_hline(
       yintercept = initial_bankroll,
       color = "#202124",
@@ -68,13 +73,42 @@ plot_strategy_comparison <- function(outcomes, initial_bankroll) {
       x = NULL,
       y = "Final bankroll",
       title = "Strategy comparison",
-      subtitle = "All strategies face the same American roulette house edge"
+      subtitle = "Changing progression changes volatility, not the underlying house edge"
     ) +
     ggplot2::scale_y_continuous(labels = scales::dollar) +
     ggplot2::scale_fill_manual(values = c(
       "Flat betting" = "#426b69",
       "Martingale" = "#b13f3f",
-      "Fibonacci" = "#7467a9"
+      "Fibonacci" = "#7467a9",
+      "D'Alembert" = "#6a6f73"
+    )) +
+    roulette_plot_theme() +
+    ggplot2::theme(legend.position = "none")
+}
+
+plot_theoretical_comparison <- function(summary_stats, initial_bankroll, spins) {
+  data <- data.frame(
+    result = c("Simulated average", "Theoretical expected"),
+    final_bankroll = c(
+      summary_stats$mean_final_bankroll,
+      initial_bankroll + summary_stats$theoretical_average_per_spin * spins
+    ),
+    stringsAsFactors = FALSE
+  )
+
+  ggplot2::ggplot(data, ggplot2::aes(result, final_bankroll, fill = result)) +
+    ggplot2::geom_col(width = 0.55, alpha = 0.9) +
+    ggplot2::geom_hline(yintercept = initial_bankroll, linetype = "dashed", color = "#202124") +
+    ggplot2::labs(
+      x = NULL,
+      y = "Average final bankroll",
+      title = "Simulated average vs theoretical expected value",
+      subtitle = "Dashed line is the starting bankroll"
+    ) +
+    ggplot2::scale_y_continuous(labels = scales::dollar) +
+    ggplot2::scale_fill_manual(values = c(
+      "Simulated average" = "#59788e",
+      "Theoretical expected" = "#b13f3f"
     )) +
     roulette_plot_theme() +
     ggplot2::theme(legend.position = "none")

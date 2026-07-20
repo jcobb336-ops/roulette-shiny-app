@@ -70,6 +70,32 @@ table {
   line-height: 1.25;
 }
 
+.input-sidebar .shiny-options-group {
+  display: grid;
+  gap: 0.6rem;
+  margin-top: 0.45rem;
+}
+
+.input-sidebar .radio {
+  margin: 0;
+}
+
+.input-sidebar .radio label {
+  display: flex;
+  min-height: 3.1rem;
+  align-items: center;
+  gap: 0.55rem;
+  padding: 0.7rem 0.85rem;
+  border: 1px solid #d8d2c8;
+  border-radius: 8px;
+  background: #ffffff;
+  cursor: pointer;
+}
+
+.input-sidebar .radio input {
+  margin-top: 0;
+}
+
 .input-sidebar label,
 .form-label,
 .checkbox label {
@@ -101,9 +127,202 @@ table {
   background: #f4efe6;
 }
 
+.note-text {
+  color: var(--muted);
+  font-size: 0.95rem;
+  font-weight: 600;
+  line-height: 1.45;
+}
+
+.warning-card > .card-body {
+  padding: 0.95rem 1rem;
+  border-left: 4px solid #b13f3f;
+  background: #fff8f6;
+}
+
+.app-footer {
+  max-width: 100%;
+  padding: 1rem 1.25rem 1.3rem;
+  color: #5b6165;
+  font-size: 0.92rem;
+  font-weight: 650;
+  text-align: center;
+}
+
 .simulation-context-card {
   margin-bottom: 1rem;
   overflow: visible;
+}
+
+.problem-card p {
+  max-width: 78rem;
+  margin-bottom: 1.1rem;
+}
+
+.composition-grid {
+  margin-top: 0.6rem;
+}
+
+.composition-item {
+  display: flex;
+  min-height: 5rem;
+  flex-direction: column;
+  justify-content: center;
+  gap: 0.25rem;
+  padding: 0.85rem 1rem;
+  border: 1px solid #d8d2c8;
+  border-radius: 8px;
+  background: #ffffff;
+}
+
+.composition-item span {
+  color: #1f2327;
+  font-size: clamp(1.7rem, 2.3vw, 2.5rem);
+  font-weight: 700;
+  line-height: 1.05;
+}
+
+.composition-item small {
+  color: #4b4f52;
+  font-size: 0.95rem;
+  font-weight: 700;
+  line-height: 1.25;
+  text-transform: uppercase;
+}
+
+.composition-item--red {
+  border-color: rgba(177, 63, 63, 0.35);
+}
+
+.composition-item--red span {
+  color: #b13f3f;
+}
+
+.composition-item--black {
+  border-color: rgba(31, 35, 39, 0.28);
+}
+
+.composition-item--green {
+  border-color: rgba(66, 107, 105, 0.45);
+}
+
+.composition-item--green span {
+  color: #426b69;
+}
+
+.roulette-layout {
+  display: grid;
+  grid-template-columns: minmax(4.5rem, 5.5rem) 1fr;
+  gap: 0.55rem;
+  margin-top: 1rem;
+  overflow-x: auto;
+}
+
+.roulette-zeroes {
+  display: grid;
+  grid-template-rows: repeat(2, minmax(3.1rem, 1fr));
+  gap: 0.45rem;
+}
+
+.roulette-number-grid {
+  display: grid;
+  gap: 0.45rem;
+  min-width: 42rem;
+}
+
+.roulette-row {
+  display: grid;
+  grid-template-columns: repeat(12, minmax(3rem, 1fr));
+  gap: 0.45rem;
+}
+
+.roulette-cell,
+.outside-cell {
+  display: flex;
+  min-height: 3.1rem;
+  align-items: center;
+  justify-content: center;
+  border-radius: 6px;
+  color: #ffffff;
+  font-size: 1rem;
+  font-weight: 750;
+  line-height: 1.15;
+  text-align: center;
+}
+
+.roulette-cell--red,
+.outside-cell--red {
+  background: #b13f3f;
+}
+
+.roulette-cell--black,
+.outside-cell--black {
+  background: #23272a;
+}
+
+.roulette-cell--green {
+  background: #426b69;
+}
+
+.roulette-outside-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(8rem, 1fr));
+  gap: 0.5rem;
+  margin-top: 0.65rem;
+}
+
+.outside-cell {
+  flex-direction: column;
+  min-height: 3.7rem;
+  border: 1px solid #d8d2c8;
+  background: #ffffff;
+  color: #25282a;
+}
+
+.outside-cell small {
+  color: #5b6165;
+  font-size: 0.8rem;
+  font-weight: 700;
+}
+
+.outside-cell--red,
+.outside-cell--black {
+  color: #ffffff;
+}
+
+.kpi-card--red .kpi-card__icon {
+  color: #b13f3f;
+  opacity: 0.75;
+}
+
+.kpi-card--black .kpi-card__icon {
+  color: #23272a;
+  opacity: 0.75;
+}
+
+.kpi-card--green .kpi-card__icon {
+  color: #426b69;
+  opacity: 0.75;
+}
+
+.formula-stack {
+  display: grid;
+  gap: 0.7rem;
+  font-size: 1rem;
+  line-height: 1.45;
+}
+
+.ev-formula {
+  margin-top: 0.15rem;
+  padding: 0.8rem 0.9rem;
+  border-left: 4px solid #b13f3f;
+  border-radius: 6px;
+  background: #f8f2ee;
+  color: #1f2327;
+  font-size: clamp(1rem, 1.25vw, 1.125rem);
+  font-weight: 750;
+  line-height: 1.35;
+  overflow-wrap: anywhere;
 }
 
 .simulation-plot-grid {
@@ -206,6 +425,16 @@ table {
   max-width: 100%;
   overflow-wrap: anywhere;
   white-space: nowrap;
+}
+
+.kpi-card__value small {
+  display: block;
+  margin-top: 0.25rem;
+  color: #5b6165;
+  font-size: 0.95rem;
+  font-weight: 700;
+  line-height: 1.2;
+  white-space: normal;
 }
 
 .kpi-card__icon {
@@ -400,6 +629,22 @@ th:first-child {
 @media (max-width: 900px) {
   .nav-link {
     font-size: 1rem;
+  }
+
+  .roulette-layout {
+    grid-template-columns: 4.25rem 1fr;
+  }
+
+  .roulette-number-grid {
+    min-width: 34rem;
+  }
+
+  .roulette-row {
+    grid-template-columns: repeat(12, minmax(2.5rem, 1fr));
+  }
+
+  .roulette-outside-grid {
+    grid-template-columns: 1fr;
   }
 
   .simulation-context {
