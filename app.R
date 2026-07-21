@@ -6,7 +6,6 @@ library(scales)
 
 source("R/roulette_rules.R")
 source("R/calculations.R")
-source("R/simulations.R")
 source("R/plotting.R")
 
 theme <- bs_theme(
@@ -123,27 +122,27 @@ ui <- page_sidebar(
     width = 330,
     class = "input-sidebar",
     h4("Betting System"),
-    radioButtons(
-      "bet_type",
-      "Long-run simulation color",
-      choices = color_bets()$bet_type,
-      selected = "Red"
-    ),
     numericInput("initial_bankroll", "Initial bankroll", value = 500, min = 1, step = 25),
-    numericInput("base_bet", "Base bet", value = 10, min = 1, step = 5),
-    sliderInput("spins", "Spins per session", min = 10, max = 500, value = 150, step = 10),
-    sliderInput("simulations", "Simulation runs", min = 100, max = 5000, value = 1000, step = 100),
+    numericInput("single_wager", "Wager amount", value = 10, min = 1, step = 5),
     checkboxInput("use_seed", "Use reproducible seed", value = FALSE),
     conditionalPanel(
       "input.use_seed",
       numericInput("seed", "Random seed", value = 12345, min = 1, step = 1)
     ),
-    actionButton("run", "Run Simulation", class = "btn-primary w-100"),
-    div(class = "run-status", textOutput("run_status")),
+    uiOutput("spin_button_ui"),
+    div(class = "bet-actions",
+      actionButton("clear_bet", "Clear Bet", class = "btn-outline-secondary"),
+      actionButton(
+        "reset_session",
+        "Reset Session",
+        class = "btn-outline-danger",
+        onclick = "return confirm('Reset this roulette session? Spin history and session results will be cleared.');"
+      )
+    ),
     tags$hr(),
     div(
       class = "sidebar-note",
-      "Use the table on the Overview tab for single spins. Use these controls for long-run simulation analysis."
+      "Select a table bet, enter a wager, and spin the wheel to update the session."
     )
   ),
   tags$head(tags$link(rel = "stylesheet", href = "styles.css")),
@@ -161,17 +160,6 @@ ui <- page_sidebar(
         card(
           card_header("Current Bet"),
           uiOutput("current_bet_panel"),
-          numericInput("single_wager", "Wager amount", value = 10, min = 1, step = 5),
-          uiOutput("spin_button_ui"),
-          div(class = "bet-actions",
-            actionButton("clear_bet", "Clear Bet", class = "btn-outline-secondary"),
-            actionButton(
-              "reset_session",
-              "Reset Session",
-              class = "btn-outline-danger",
-              onclick = "return confirm('Reset this roulette session? Spin history and session results will be cleared.');"
-            )
-          ),
           uiOutput("spin_message")
         )
       ),
@@ -221,46 +209,13 @@ ui <- page_sidebar(
         card(card_header("Expected-value calculation"), uiOutput("ev_explanation")),
         card(card_header("Plain-language interpretation"), uiOutput("plain_language"))
       ),
-      card(card_header("Exact calculation summary"), tableOutput("metric_table")),
-      card(card_header("Theoretical expected bankroll"), plotOutput("ev_plot", height = 360))
-    ),
-    nav_panel(
-      "Simulation",
-      card(
-        class = "simulation-context-card",
-        div(
-          class = "simulation-context",
-          div(class = "simulation-context__label", "Current simulation"),
-          div(class = "simulation-context__value", textOutput("simulation_context", inline = TRUE))
-        )
-      ),
-      layout_columns(
-        col_widths = c(3, 3, 3, 3),
-        row_heights = "6.25rem",
-        gap = "1.5rem",
-        kpi_card("Wins", textOutput("total_wins"), bsicons::bs_icon("check-circle")),
-        kpi_card("Losses", textOutput("total_losses"), bsicons::bs_icon("x-circle")),
-        kpi_card("Average ending bankroll", textOutput("mean_final"), bsicons::bs_icon("wallet2")),
-        kpi_card("Net profit/loss", textOutput("net_profit"), bsicons::bs_icon("activity"))
-      ),
-      layout_columns(
-        col_widths = c(6, 6),
-        class = "simulation-plot-grid",
-        card(card_header("Cumulative bankroll"), plotOutput("paths_plot", height = 420)),
-        card(card_header("Ending bankroll distribution"), plotOutput("distribution_plot", height = 420))
-      ),
-      card(card_header("Simulated average vs theoretical expected value"), plotOutput("theory_comparison_plot", height = 360)),
-      card(card_header("Detailed results"), tableOutput("simulation_table"))
-    ),
-    nav_panel(
-      "Strategy Comparison",
       card(
         class = "warning-card",
         strong("Important: "),
         "Betting systems may change short-term volatility and bankroll risk, but they do not change the underlying expected value of the roulette game."
       ),
-      card(card_header("Flat betting vs Martingale vs Fibonacci vs D'Alembert"), plotOutput("comparison_plot", height = 460)),
-      card(card_header("Comparison table"), tableOutput("comparison_table"))
+      card(card_header("Exact calculation summary"), tableOutput("metric_table")),
+      card(card_header("Theoretical expected bankroll"), plotOutput("ev_plot", height = 360))
     ),
     nav_panel(
       "Methodology",
@@ -272,18 +227,8 @@ ui <- page_sidebar(
           tags$li("Red, black, odd, even, low, and high each cover 18 non-green pockets and pay 1:1."),
           tags$li("Dozens and columns each cover 12 non-green pockets and pay 2:1."),
           tags$li("Expected value is calculated as win probability times win profit plus loss probability times loss amount."),
-          tags$li("The single-spin game and long-run simulations use the central rules and payout definitions in the R folder."),
-          tags$li("Sessions stop early when the bankroll reaches zero. If a strategy requests more than the remaining bankroll, the app wagers the remaining bankroll."),
+          tags$li("The single-spin game uses the central rules and payout definitions in the R folder."),
           tags$li("No table maximum, taxes, comps, dealer errors, wheel bias, or casino promotions are modeled.")
-        )
-      ),
-      card(
-        card_header("Strategy definitions"),
-        tags$ul(
-          tags$li(strong("Flat betting: "), "the wager stays equal to the base bet."),
-          tags$li(strong("Martingale: "), "the wager doubles after each loss and resets after a win."),
-          tags$li(strong("Fibonacci: "), "the wager moves one step up the Fibonacci sequence after a loss and two steps down after a win."),
-          tags$li(strong("D'Alembert: "), "the wager increases by one base unit after a loss and decreases by one base unit after a win.")
         )
       )
     )
@@ -508,115 +453,45 @@ server <- function(input, output, session) {
       head(12)
   })
 
-  observeEvent(input$base_bet, {
-    if (input$base_bet > input$initial_bankroll) {
-      updateNumericInput(session, "base_bet", value = input$initial_bankroll)
-    }
-  })
-
-  metrics <- reactive({
-    validate(
-      need(input$initial_bankroll > 0, "Initial bankroll must be positive."),
-      need(input$base_bet > 0, "Base bet must be positive."),
-      need(input$base_bet <= input$initial_bankroll, "Base bet cannot exceed the initial bankroll.")
-    )
-
-    bet_metrics(input$bet_type, input$base_bet, input$spins)
-  })
-
-  simulation_seed <- reactive({
-    if (isTRUE(input$use_seed)) input$seed else NULL
-  })
-
-  simulation <- eventReactive(input$run, {
-    validate(need(input$base_bet <= input$initial_bankroll, "Base bet cannot exceed the initial bankroll."))
-
-    withProgress(message = "Running roulette simulation", value = 0.35, {
-      result <- simulate_sessions(
-        initial_bankroll = input$initial_bankroll,
-        base_bet = input$base_bet,
-        spins = input$spins,
-        simulations = input$simulations,
-        bet_type = input$bet_type,
-        strategy = "Flat betting",
-        seed = simulation_seed()
-      )
-      incProgress(0.65)
-      result
-    })
-  }, ignoreNULL = TRUE)
-
-  comparison <- eventReactive(input$run, {
-    withProgress(message = "Comparing strategies", value = 0.35, {
-      result <- simulate_strategy_comparison(
-        initial_bankroll = input$initial_bankroll,
-        base_bet = input$base_bet,
-        spins = input$spins,
-        simulations = input$simulations,
-        bet_type = input$bet_type,
-        seed = simulation_seed()
-      )
-      incProgress(0.65)
-      result
-    })
-  }, ignoreNULL = TRUE)
-
-  summary_stats <- reactive({
-    req(simulation())
-    summarize_outcomes(
-      simulation()$outcomes,
-      initial_bankroll = input$initial_bankroll,
-      base_bet = input$base_bet,
-      spins = input$spins,
-      bet_type = input$bet_type
-    )
-  })
-
   output$payout_table <- renderTable({
     roulette_bets() |>
       rename(`Bet type` = bet_type, `Also called` = also_called, Example = example, Payout = payout)
   })
 
-  output$run_status <- renderText({
-    if (input$run == 0) {
-      "Ready to run with current inputs."
-    } else {
-      paste("Last run:", format(Sys.time(), "%I:%M:%S %p"), "|", format(input$simulations, big.mark = ","), "sessions")
-    }
+  analysis_bet_id <- reactive({
+    if (is.null(selected_bet_id())) "red" else selected_bet_id()
   })
 
-  output$simulation_context <- renderText({
-    if (input$run == 0) {
-      return("Set parameters in the sidebar, then click Run Simulation.")
-    }
-
-    paste(format(input$simulations, big.mark = ","), "sessions", "|", input$spins, "spins each", "| Flat betting |", input$bet_type)
+  analysis_metrics <- reactive({
+    standard_bet_metrics(analysis_bet_id(), input$single_wager)
   })
 
-  output$win_probability <- renderText(percent(metrics()$probability_win, accuracy = 0.01))
-  output$loss_probability <- renderText(percent(metrics()$probability_loss, accuracy = 0.01))
-  output$payout <- renderText(metrics()$payout_label)
-  output$house_edge <- renderText(percent(metrics()$house_edge, accuracy = 0.01))
+  output$win_probability <- renderText(percent(analysis_metrics()$probability_win, accuracy = 0.01))
+  output$loss_probability <- renderText(percent(analysis_metrics()$probability_loss, accuracy = 0.01))
+  output$payout <- renderText(analysis_metrics()$payout_label)
+  output$house_edge <- renderText(percent(analysis_metrics()$house_edge, accuracy = 0.01))
 
   output$ev_explanation <- renderUI({
-    m <- metrics()
-    win_profit <- input$base_bet * m$payout_to_one
-    formula <- paste0("EV = (", m$win_slots, "/38 x ", currency(win_profit), ") + (", m$losing_slots, "/38 x -", currency(input$base_bet), ")")
+    m <- analysis_metrics()
+    loss_pockets <- AMERICAN_ROULETTE$slot_count - m$pockets_covered
+    formula <- paste0("EV = (", m$pockets_covered, "/38 x ", currency(m$potential_net_profit), ") + (", loss_pockets, "/38 x -", currency(m$wager), ")")
 
     tagList(
       div(class = "formula-stack",
-        div(strong("Probability of winning: "), m$win_slots, "/38 = ", percent(m$probability_win, accuracy = 0.01)),
-        div(strong("Probability of losing: "), m$losing_slots, "/38 = ", percent(m$probability_loss, accuracy = 0.01)),
+        div(strong("Selected bet: "), m$bet_type, " - ", m$selection),
+        div(strong("Probability of winning: "), m$pockets_covered, "/38 = ", percent(m$probability_win, accuracy = 0.01)),
+        div(strong("Probability of losing: "), loss_pockets, "/38 = ", percent(m$probability_loss, accuracy = 0.01)),
         div(strong("Payout: "), m$payout_label),
         div(class = "ev-formula", formula),
-        div(class = "ev-formula", "EV = ", currency_precise(m$expected_value_per_bet), " per spin"),
-        div(strong("Expected loss over selected spins: "), currency(m$expected_value_total))
+        div(class = "ev-formula", "EV = ", currency_precise(m$expected_value), " per spin")
       )
     )
   })
 
   output$plain_language <- renderUI({
-    if (input$bet_type %in% c("Red", "Black")) {
+    m <- analysis_metrics()
+
+    if (m$bet_type %in% c("Red", "Black")) {
       tagList(
         p("For a $1 red or black bet:"),
         div(class = "formula-stack",
@@ -627,82 +502,56 @@ server <- function(input, output, session) {
         ),
         p("Red and black are not true 50/50 bets because both 0 and 00 cause the wager to lose.")
       )
+    } else if (m$bet_type %in% c("First dozen", "Second dozen", "Third dozen", "Column 1", "Column 2", "Column 3")) {
+      tagList(
+        p("Dozens and columns cover 12 pockets and pay 2 to 1."),
+        div(class = "formula-stack",
+          div("Probability of winning = 12/38 = 31.58%"),
+          div("Probability of losing = 26/38 = 68.42%"),
+          div(class = "ev-formula", "EV per $1 = (12/38 x $2) + (26/38 x -$1) = -$0.0526")
+        ),
+        p("The payout is higher than an even-money bet, but the lower win probability keeps the same American roulette house edge.")
+      )
+    } else if (m$bet_type == "Straight-up") {
+      tagList(
+        p("A straight-up bet covers one pocket and pays 35 to 1."),
+        div(class = "formula-stack",
+          div("Probability of winning = 1/38 = 2.63%"),
+          div("Probability of losing = 37/38 = 97.37%"),
+          div(class = "ev-formula", "EV per $1 = (1/38 x $35) + (37/38 x -$1) = -$0.0526")
+        ),
+        p("Clickable 0 and 00 are handled as separate straight-up bets, not a combined green wager.")
+      )
     } else {
       tagList(
-        p("The Green (0, 00) simulation option wins only on the two green pockets and loses on the other 36 pockets."),
-        p("It is modeled as a custom two-pocket wager paying 17 to 1, so the expected loss is still 5.26 cents per $1 wagered.")
+        p("This outside bet covers 18 non-green pockets and pays even money."),
+        p("Both 0 and 00 cause outside bets to lose, which creates the 5.26% American roulette house edge.")
       )
     }
   })
 
   output$metric_table <- renderTable({
-    m <- metrics()
+    m <- analysis_metrics()
+    loss_pockets <- AMERICAN_ROULETTE$slot_count - m$pockets_covered
     data.frame(
-      Metric = c("Game", "Selected bet", "Winning pockets", "Losing pockets", "Winning probability", "Losing probability", "Payout", "Expected profit or loss per spin", "House edge", "Expected loss over selected spins", "Payout assumption"),
-      Value = c(m$game, m$bet_type, m$win_slots, m$losing_slots, percent(m$probability_win, accuracy = 0.01), percent(m$probability_loss, accuracy = 0.01), m$payout_label, currency(m$expected_value_per_bet), percent(m$house_edge, accuracy = 0.01), currency(m$expected_value_total), m$model_note)
+      Metric = c("Game", "Selected bet", "Selection", "Winning pockets", "Losing pockets", "Winning probability", "Losing probability", "Payout", "Wager", "Expected profit or loss per spin", "House edge"),
+      Value = c(AMERICAN_ROULETTE$name, m$bet_type, m$selection, m$pockets_covered, loss_pockets, percent(m$probability_win, accuracy = 0.01), percent(m$probability_loss, accuracy = 0.01), m$payout_label, currency(m$wager), currency_precise(m$expected_value), percent(m$house_edge, accuracy = 0.01))
     )
   })
 
   output$ev_plot <- renderPlot({
-    curve <- ev_curve(input$initial_bankroll, input$bet_type, input$base_bet, input$spins)
+    m <- analysis_metrics()
+    curve <- data.frame(
+      spin = seq_len(150),
+      expected_bankroll = input$initial_bankroll + seq_len(150) * m$expected_value
+    )
+
     ggplot(curve, aes(spin, expected_bankroll)) +
       geom_line(color = "#b13f3f", linewidth = 1.2) +
       geom_hline(yintercept = input$initial_bankroll, linetype = "dashed", color = "#202124") +
       labs(x = "Spin", y = "Expected bankroll") +
       scale_y_continuous(labels = dollar) +
       roulette_plot_theme()
-  })
-
-  output$total_wins <- renderText({ req(summary_stats()); format(summary_stats()$wins, big.mark = ",") })
-  output$total_losses <- renderText({ req(summary_stats()); format(summary_stats()$losses, big.mark = ",") })
-  output$mean_final <- renderText(currency(summary_stats()$mean_final_bankroll))
-  output$net_profit <- renderText(currency(summary_stats()$net_profit))
-
-  output$paths_plot <- renderPlot({
-    req(simulation())
-    expected <- ev_curve(input$initial_bankroll, input$bet_type, input$base_bet, input$spins)
-    plot_bankroll_paths(simulation()$paths, expected)
-  })
-
-  output$distribution_plot <- renderPlot({
-    req(simulation(), summary_stats())
-    theoretical_final <- input$initial_bankroll + summary_stats()$theoretical_average_per_spin * input$spins
-    plot_final_distribution(simulation()$outcomes, input$initial_bankroll, theoretical_final)
-  })
-
-  output$theory_comparison_plot <- renderPlot({
-    req(summary_stats())
-    plot_theoretical_comparison(summary_stats(), input$initial_bankroll, input$spins)
-  })
-
-  output$simulation_table <- renderTable({
-    req(summary_stats())
-    s <- summary_stats()
-    data.frame(
-      Metric = c("Sessions", "Wins", "Losses", "Ending bankroll", "Net profit or loss", "Simulated win percentage", "Average result per spin", "Theoretical expected result", "Difference between simulated and theoretical", "Probability of finishing profitable", "Probability of bankroll depletion", "Average maximum drawdown", "Total amount wagered"),
-      Value = c(format(s$sessions, big.mark = ","), format(s$wins, big.mark = ","), format(s$losses, big.mark = ","), currency(s$mean_final_bankroll), currency(s$net_profit), percent(s$simulated_win_percentage, accuracy = 0.01), currency_precise(s$average_result_per_spin), currency(s$theoretical_expected_result), currency(s$difference_from_theoretical), percent(s$probability_profit, accuracy = 0.1), percent(s$probability_ruin, accuracy = 0.1), currency(s$max_drawdown), currency(s$total_wagered))
-    )
-  })
-
-  output$comparison_plot <- renderPlot({
-    req(comparison())
-    plot_strategy_comparison(comparison(), input$initial_bankroll)
-  })
-
-  output$comparison_table <- renderTable({
-    req(comparison())
-    comparison() |>
-      group_by(strategy) |>
-      summarise(
-        `Average ending bankroll` = currency(mean(final_bankroll)),
-        `Average profit or loss` = currency(mean(profit)),
-        `Probability of profit` = percent(mean(profit > 0), accuracy = 0.1),
-        `Risk of ruin` = percent(mean(ruined), accuracy = 0.1),
-        `Maximum drawdown` = currency(mean(max_drawdown)),
-        `Total amount wagered` = currency(sum(total_wagered)),
-        .groups = "drop"
-      ) |>
-      rename(Strategy = strategy)
   })
 }
 
