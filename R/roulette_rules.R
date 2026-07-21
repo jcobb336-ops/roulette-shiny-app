@@ -8,6 +8,88 @@ AMERICAN_ROULETTE <- list(
   house_edge = 2 / 38
 )
 
+wheel_pockets <- function() {
+  AMERICAN_ROULETTE$slots
+}
+
+pocket_color <- function(pocket) {
+  if (pocket %in% AMERICAN_ROULETTE$green_slots) {
+    return("Green")
+  }
+
+  number <- as.integer(pocket)
+  if (number %in% AMERICAN_ROULETTE$red_numbers) {
+    "Red"
+  } else {
+    "Black"
+  }
+}
+
+pocket_color_class <- function(pocket) {
+  tolower(pocket_color(pocket))
+}
+
+standard_bet_definitions <- function() {
+  numbers <- as.character(1:36)
+  red <- as.character(AMERICAN_ROULETTE$red_numbers)
+  black <- as.character(AMERICAN_ROULETTE$black_numbers)
+  odd <- as.character(seq(1, 35, by = 2))
+  even <- as.character(seq(2, 36, by = 2))
+  low <- as.character(1:18)
+  high <- as.character(19:36)
+  dozen_1 <- as.character(1:12)
+  dozen_2 <- as.character(13:24)
+  dozen_3 <- as.character(25:36)
+  column_1 <- as.character(c(1, 4, 7, 10, 13, 16, 19, 22, 25, 28, 31, 34))
+  column_2 <- as.character(c(2, 5, 8, 11, 14, 17, 20, 23, 26, 29, 32, 35))
+  column_3 <- as.character(c(3, 6, 9, 12, 15, 18, 21, 24, 27, 30, 33, 36))
+
+  straight <- lapply(wheel_pockets(), function(pocket) {
+    data.frame(
+      bet_id = paste0("straight_", gsub("00", "double_zero", pocket)),
+      bet_type = "Straight-up",
+      selection = pocket,
+      pockets = I(list(pocket)),
+      payout_to_one = 35,
+      stringsAsFactors = FALSE
+    )
+  })
+
+  outside <- list(
+    data.frame(bet_id = "red", bet_type = "Red", selection = "18 red numbers", pockets = I(list(red)), payout_to_one = 1),
+    data.frame(bet_id = "black", bet_type = "Black", selection = "18 black numbers", pockets = I(list(black)), payout_to_one = 1),
+    data.frame(bet_id = "odd", bet_type = "Odd", selection = "18 odd numbers", pockets = I(list(odd)), payout_to_one = 1),
+    data.frame(bet_id = "even", bet_type = "Even", selection = "18 even numbers", pockets = I(list(even)), payout_to_one = 1),
+    data.frame(bet_id = "low", bet_type = "Low", selection = "1-18", pockets = I(list(low)), payout_to_one = 1),
+    data.frame(bet_id = "high", bet_type = "High", selection = "19-36", pockets = I(list(high)), payout_to_one = 1),
+    data.frame(bet_id = "dozen_1", bet_type = "First dozen", selection = "1-12", pockets = I(list(dozen_1)), payout_to_one = 2),
+    data.frame(bet_id = "dozen_2", bet_type = "Second dozen", selection = "13-24", pockets = I(list(dozen_2)), payout_to_one = 2),
+    data.frame(bet_id = "dozen_3", bet_type = "Third dozen", selection = "25-36", pockets = I(list(dozen_3)), payout_to_one = 2),
+    data.frame(bet_id = "column_1", bet_type = "Column 1", selection = "1, 4, 7 ... 34", pockets = I(list(column_1)), payout_to_one = 2),
+    data.frame(bet_id = "column_2", bet_type = "Column 2", selection = "2, 5, 8 ... 35", pockets = I(list(column_2)), payout_to_one = 2),
+    data.frame(bet_id = "column_3", bet_type = "Column 3", selection = "3, 6, 9 ... 36", pockets = I(list(column_3)), payout_to_one = 2)
+  )
+
+  bets <- do.call(rbind, c(straight, outside))
+  bets$pockets_covered <- vapply(bets$pockets, length, integer(1))
+  bets$probability_win <- bets$pockets_covered / AMERICAN_ROULETTE$slot_count
+  bets$probability_loss <- 1 - bets$probability_win
+  bets$payout_label <- paste(bets$payout_to_one, "to 1")
+  rownames(bets) <- NULL
+  bets
+}
+
+get_standard_bet <- function(bet_id) {
+  bets <- standard_bet_definitions()
+  bet <- bets[bets$bet_id == bet_id, , drop = FALSE]
+
+  if (nrow(bet) != 1) {
+    stop("Unknown standard bet: ", bet_id, call. = FALSE)
+  }
+
+  bet
+}
+
 color_bets <- function() {
   data.frame(
     bet_type = c("Red", "Black", "Green (0, 00)"),

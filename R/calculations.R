@@ -40,6 +40,70 @@ bet_metrics <- function(bet_type, bet_size, spins) {
   )
 }
 
+standard_bet_metrics <- function(bet_id, wager = 1) {
+  bet <- get_standard_bet(bet_id)
+  expected_value <- bet$probability_win * (wager * bet$payout_to_one) +
+    bet$probability_loss * (-wager)
+
+  data.frame(
+    bet_id = bet$bet_id,
+    bet_type = bet$bet_type,
+    selection = bet$selection,
+    pockets_covered = bet$pockets_covered,
+    probability_win = bet$probability_win,
+    probability_loss = bet$probability_loss,
+    payout_to_one = bet$payout_to_one,
+    payout_label = bet$payout_label,
+    wager = wager,
+    potential_net_profit = wager * bet$payout_to_one,
+    total_returned = wager + wager * bet$payout_to_one,
+    expected_value = expected_value,
+    house_edge = -expected_value / wager,
+    stringsAsFactors = FALSE
+  )
+}
+
+validate_wager <- function(wager, bankroll) {
+  if (is.null(wager) || is.na(wager) || !is.numeric(wager)) {
+    return("Wager must be a number.")
+  }
+  if (is.null(bankroll) || is.na(bankroll) || !is.numeric(bankroll)) {
+    return("Bankroll must be a number.")
+  }
+  if (wager <= 0) {
+    return("Wager must be greater than zero.")
+  }
+  if (wager > bankroll) {
+    return("Wager cannot exceed the current bankroll.")
+  }
+  TRUE
+}
+
+spin_wheel <- function() {
+  sample(wheel_pockets(), size = 1)
+}
+
+evaluate_bet_result <- function(bet_id, winning_pocket, wager) {
+  bet <- get_standard_bet(bet_id)
+  won <- winning_pocket %in% bet$pockets[[1]]
+  net_result <- if (won) wager * bet$payout_to_one else -wager
+
+  data.frame(
+    winning_pocket = winning_pocket,
+    winning_color = pocket_color(winning_pocket),
+    bet_type = bet$bet_type,
+    selection = bet$selection,
+    wager = wager,
+    won = won,
+    net_result = net_result,
+    stringsAsFactors = FALSE
+  )
+}
+
+update_bankroll <- function(bankroll, net_result) {
+  max(0, bankroll + net_result)
+}
+
 summarize_outcomes <- function(outcomes, initial_bankroll, base_bet, spins, bet_type) {
   metrics <- bet_metrics(bet_type, base_bet, spins)
   total_spins <- sum(outcomes$spins_played)

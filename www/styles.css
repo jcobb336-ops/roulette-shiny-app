@@ -236,8 +236,38 @@ table {
   gap: 0.45rem;
 }
 
+.roulette-bet-button {
+  width: 100%;
+  border: 2px solid transparent;
+  box-shadow: none;
+  cursor: pointer;
+  transition: border-color 0.15s ease, transform 0.15s ease, box-shadow 0.15s ease;
+}
+
+.roulette-bet-button:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(31, 35, 39, 0.16);
+}
+
+.roulette-bet-button.is-selected {
+  border-color: #f2c94c !important;
+  box-shadow: 0 0 0 4px rgba(242, 201, 76, 0.3);
+}
+
+.roulette-bet-button.is-selected::after {
+  content: "Selected";
+  display: block;
+  margin-top: 0.2rem;
+  font-size: 0.68rem;
+  font-weight: 800;
+  letter-spacing: 0.02em;
+  text-transform: uppercase;
+}
+
 .roulette-cell,
-.outside-cell {
+.outside-cell,
+.roulette-bet-button.roulette-cell,
+.roulette-bet-button.outside-cell {
   display: flex;
   min-height: 3.1rem;
   align-items: center;
@@ -251,16 +281,21 @@ table {
 }
 
 .roulette-cell--red,
-.outside-cell--red {
+.outside-cell--red,
+.roulette-bet-button.roulette-cell--red,
+.roulette-bet-button.outside-cell--red {
   background: #b13f3f;
 }
 
 .roulette-cell--black,
-.outside-cell--black {
+.outside-cell--black,
+.roulette-bet-button.roulette-cell--black,
+.roulette-bet-button.outside-cell--black {
   background: #23272a;
 }
 
-.roulette-cell--green {
+.roulette-cell--green,
+.roulette-bet-button.roulette-cell--green {
   background: #426b69;
 }
 
@@ -279,6 +314,10 @@ table {
   color: #25282a;
 }
 
+.roulette-bet-button.outside-cell {
+  color: #25282a;
+}
+
 .outside-cell small {
   color: #5b6165;
   font-size: 0.8rem;
@@ -286,8 +325,92 @@ table {
 }
 
 .outside-cell--red,
-.outside-cell--black {
+.outside-cell--black,
+.roulette-bet-button.outside-cell--red,
+.roulette-bet-button.outside-cell--black {
   color: #ffffff;
+}
+
+.roulette-bet-button.outside-cell--red small,
+.roulette-bet-button.outside-cell--black small {
+  color: rgba(255, 255, 255, 0.82);
+}
+
+.roulette-column-grid,
+.roulette-dozen-grid {
+  grid-template-columns: repeat(3, minmax(8rem, 1fr));
+}
+
+.current-bet-empty,
+.spin-message {
+  margin-bottom: 0.85rem;
+  padding: 0.8rem 0.9rem;
+  border: 1px solid #d8d2c8;
+  border-radius: 8px;
+  background: #ffffff;
+  color: #4b4f52;
+  font-size: 0.95rem;
+  line-height: 1.4;
+}
+
+.selected-bet-label {
+  color: #5b6165;
+  font-size: 0.82rem;
+  font-weight: 800;
+  line-height: 1.2;
+  text-transform: uppercase;
+}
+
+.current-bet-table {
+  margin: 0.5rem 0 1rem;
+  font-size: 0.9rem;
+}
+
+.current-bet-table th,
+.current-bet-table td {
+  padding: 0.35rem 0;
+  border: 0;
+  vertical-align: top;
+}
+
+.current-bet-table th {
+  width: 48%;
+  padding-right: 0.65rem;
+  color: #4b4f52;
+  font-weight: 750;
+}
+
+.current-bet-table td {
+  text-align: left !important;
+  font-weight: 650;
+}
+
+.bet-actions {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 0.65rem;
+  margin-top: 0.65rem;
+}
+
+.spin-message {
+  margin-top: 0.85rem;
+  margin-bottom: 0;
+}
+
+.spin-message--win {
+  border-color: rgba(66, 107, 105, 0.45);
+  background: #eef7f3;
+  color: #234d49;
+}
+
+.spin-message--loss {
+  border-color: rgba(177, 63, 63, 0.35);
+  background: #fff4f2;
+  color: #7e2f2f;
+}
+
+.spin-message--neutral {
+  background: #f8f6f1;
 }
 
 .kpi-card--red .kpi-card__icon {

@@ -113,3 +113,35 @@ plot_theoretical_comparison <- function(summary_stats, initial_bankroll, spins) 
     roulette_plot_theme() +
     ggplot2::theme(legend.position = "none")
 }
+
+plot_session_bankroll <- function(history, initial_bankroll) {
+  if (nrow(history) == 0) {
+    history <- data.frame(
+      spin = 0,
+      bankroll = initial_bankroll
+    )
+  } else {
+    history <- data.frame(
+      spin = c(0, history$spin),
+      bankroll = c(initial_bankroll, history$bankroll_after)
+    )
+  }
+
+  plot <- ggplot2::ggplot(history, ggplot2::aes(spin, bankroll)) +
+    ggplot2::geom_point(color = "#426b69", size = 2.5) +
+    ggplot2::geom_hline(yintercept = initial_bankroll, linetype = "dashed", color = "#202124") +
+    ggplot2::labs(
+      x = "Spin",
+      y = "Bankroll",
+      title = "Bankroll over time",
+      subtitle = "Dashed line is the starting bankroll"
+    ) +
+    ggplot2::scale_y_continuous(labels = scales::dollar) +
+    roulette_plot_theme()
+
+  if (nrow(history) >= 2) {
+    plot <- plot + ggplot2::geom_line(color = "#426b69", linewidth = 1)
+  }
+
+  plot
+}
